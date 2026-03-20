@@ -14,7 +14,7 @@ class DeployCommand extends Command {
   String get name => 'deploy';
 
   @override
-  String get description => 'Build and deploy the Flutter CMS studio to cloud';
+  String get description => 'Build and deploy the Dart Desk studio to cloud';
 
   DeployCommand() {
     argParser

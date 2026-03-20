@@ -1,5 +1,5 @@
 name: dart_desk_cli
-description: CLI tool for deploying Flutter CMS studios to the cloud.
+description: CLI tool for deploying Dart Desk studios to the cloud.
 version: 0.1.0
 publish_to: none
 

@@ -11,7 +11,7 @@ class LoginCommand extends Command {
   String get name => 'login';
 
   @override
-  String get description => 'Authenticate with Flutter CMS cloud via browser';
+  String get description => 'Authenticate with Dart Desk cloud via browser';
 
   LoginCommand() {
     argParser.addOption('server', help: 'Server URL (overrides dart_desk.yaml)');

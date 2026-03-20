@@ -308,7 +308,7 @@
       "languageVersion": "3.4"
     },
     {
-      "name": "flutter_cms_cli",
+      "name": "dart_desk_cli",
       "rootUri": "../",
       "packageUri": "lib/",
       "languageVersion": "3.5"
