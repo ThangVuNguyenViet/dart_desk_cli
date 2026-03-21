@@ -18,9 +18,13 @@ class DeployCommand extends Command {
 
   DeployCommand() {
     argParser
-      ..addOption('token', help: 'API token for CI/CD (skips saved credentials)')
-      ..addFlag('skip-build', help: 'Skip flutter build web, upload existing build/', negatable: false)
-      ..addOption('commit', help: 'Git commit hash to associate with deployment');
+      ..addOption('token',
+          help: 'API token for CI/CD (skips saved credentials)')
+      ..addFlag('skip-build',
+          help: 'Skip flutter build web, upload existing build/',
+          negatable: false)
+      ..addOption('commit',
+          help: 'Git commit hash to associate with deployment');
   }
 
   @override
@@ -59,7 +63,8 @@ class DeployCommand extends Command {
     }
 
     stdout.writeln('Deploying ${config.slug}...');
-    final url = Uri.parse('${config.server}/deployment/upload?slug=${config.slug}');
+    final url =
+        Uri.parse('${config.server}/deployment/upload?slug=${config.slug}');
 
     final request = http.Request('POST', url)
       ..headers['Authorization'] = 'Bearer $token'
@@ -108,6 +113,6 @@ class DeployCommand extends Command {
     }
 
     final tarBytes = TarEncoder().encode(archive);
-    return GZipEncoder().encode(tarBytes)!;
+    return GZipEncoder().encode(tarBytes);
   }
 }
