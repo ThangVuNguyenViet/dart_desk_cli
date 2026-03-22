@@ -1,13 +1,18 @@
 name: dart_desk_cli
-description: CLI tool for deploying Dart Desk studios to the cloud.
+description: Command-line interface for deploying and managing self-hosted Dart Desk CMS instances.
 version: 0.1.0
-publish_to: none
+homepage: https://github.com/ThangVuNguyenViet/dart_desk_cli
+repository: https://github.com/ThangVuNguyenViet/dart_desk_cli
+topics:
+  - cms
+  - cli
+  - deploy
 
 environment:
   sdk: ^3.5.0
 
 executables:
-  dart_desk: dart_desk
+  dart_desk: dart_desk_cli
 
 dependencies:
   args: ^2.5.0
@@ -17,4 +22,5 @@ dependencies:
   path: ^1.9.0
 
 dev_dependencies:
+  lints: ^5.1.1
   test: ^1.24.0

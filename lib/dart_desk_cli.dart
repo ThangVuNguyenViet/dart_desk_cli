@@ -1,1 +1,2 @@
-library dart_desk_cli;
+export 'src/config.dart';
+export 'src/credentials.dart';
