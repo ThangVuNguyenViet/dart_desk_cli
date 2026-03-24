@@ -3,10 +3,10 @@ import 'package:yaml/yaml.dart';
 import 'package:path/path.dart' as p;
 
 class CmsConfig {
-  final String slug;
+  final String projectSlug;
   final String server;
 
-  CmsConfig({required this.slug, required this.server});
+  CmsConfig({required this.projectSlug, required this.server});
 
   static CmsConfig load([String? projectDir]) {
     final dir = projectDir ?? Directory.current.path;
@@ -16,18 +16,18 @@ class CmsConfig {
       throw Exception(
         'dart_desk.yaml not found in $dir\n'
         'Create one with:\n'
-        '  slug: your-project-slug\n'
+        '  project_slug: your-project-slug\n'
         '  server: https://api.dartdesk.dev',
       );
     }
 
     final yaml = loadYaml(file.readAsStringSync()) as YamlMap;
-    final slug = yaml['slug'] as String?;
-    if (slug == null || slug.isEmpty) {
-      throw Exception('dart_desk.yaml must contain a "slug" field');
+    final projectSlug = yaml['project_slug'] as String?;
+    if (projectSlug == null || projectSlug.isEmpty) {
+      throw Exception('dart_desk.yaml must contain a "project_slug" field');
     }
 
     final server = (yaml['server'] as String?) ?? 'https://api.dartdesk.dev';
-    return CmsConfig(slug: slug, server: server.replaceAll(RegExp(r'/$'), ''));
+    return CmsConfig(projectSlug: projectSlug, server: server.replaceAll(RegExp(r'/$'), ''));
   }
 }

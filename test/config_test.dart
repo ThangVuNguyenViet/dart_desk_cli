@@ -15,15 +15,15 @@ void main() {
       tempDir.deleteSync(recursive: true);
     });
 
-    test('loads slug and server from yaml', () {
-      File(p.join(tempDir.path, 'dart_desk.yaml')).writeAsStringSync('slug: my-project\nserver: https://custom.server.com\n');
+    test('loads project_slug and server from yaml', () {
+      File(p.join(tempDir.path, 'dart_desk.yaml')).writeAsStringSync('project_slug: my-project\nserver: https://custom.server.com\n');
       final config = CmsConfig.load(tempDir.path);
-      expect(config.slug, 'my-project');
+      expect(config.projectSlug, 'my-project');
       expect(config.server, 'https://custom.server.com');
     });
 
     test('defaults server when not specified', () {
-      File(p.join(tempDir.path, 'dart_desk.yaml')).writeAsStringSync('slug: my-project\n');
+      File(p.join(tempDir.path, 'dart_desk.yaml')).writeAsStringSync('project_slug: my-project\n');
       final config = CmsConfig.load(tempDir.path);
       expect(config.server, 'https://api.dartdesk.dev');
     });
@@ -32,7 +32,7 @@ void main() {
       expect(() => CmsConfig.load(tempDir.path), throwsException);
     });
 
-    test('throws when slug missing', () {
+    test('throws when project_slug missing', () {
       File(p.join(tempDir.path, 'dart_desk.yaml')).writeAsStringSync('server: https://example.com\n');
       expect(() => CmsConfig.load(tempDir.path), throwsException);
     });

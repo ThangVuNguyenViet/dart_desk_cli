@@ -13,7 +13,8 @@ dart pub global activate dart_desk_cli
 Create a `dart_desk.yaml` file in your project root:
 
 ```yaml
-server_url: https://your-server.example.com
+project_slug: my-project
+server: https://api.dartdesk.dev
 ```
 
 ## Commands

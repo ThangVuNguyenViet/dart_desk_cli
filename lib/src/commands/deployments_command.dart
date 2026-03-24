@@ -36,11 +36,11 @@ class _ListSubcommand extends Command {
     final token = _resolveToken(argResults);
 
     final response = await http.get(
-      Uri.parse('${config.server}/deployment?slug=${config.slug}&action=list'),
+      Uri.parse('${config.server}/deployment?slug=${config.projectSlug}&action=list'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
-    stdout.writeln('Deployments for ${config.slug}:');
+    stdout.writeln('Deployments for ${config.projectSlug}:');
     stdout.writeln(response.body);
   }
 }
@@ -65,12 +65,12 @@ class _RollbackSubcommand extends Command {
     final version = int.parse(argResults!['version']);
 
     final response = await http.post(
-      Uri.parse('${config.server}/deployment?slug=${config.slug}&action=activate&version=$version'),
+      Uri.parse('${config.server}/deployment?slug=${config.projectSlug}&action=activate&version=$version'),
       headers: {'Authorization': 'Bearer $token'},
     );
 
     if (response.statusCode == 200) {
-      stdout.writeln('Activated v$version for ${config.slug}');
+      stdout.writeln('Activated v$version for ${config.projectSlug}');
     } else {
       stderr.writeln('Rollback failed: ${response.body}');
       exit(1);
