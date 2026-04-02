@@ -62,9 +62,9 @@ class DeployCommand extends Command {
       exit(1);
     }
 
-    stdout.writeln('Deploying ${config.projectSlug}...');
+    stdout.writeln('Deploying ${config.projectId}...');
     final url =
-        Uri.parse('${config.server}/deployment/upload?slug=${config.projectSlug}');
+        Uri.parse('${config.server}/deployment/upload?slug=${config.projectId}');
 
     final request = http.Request('POST', url)
       ..headers['Authorization'] = 'Bearer $token'
@@ -90,11 +90,11 @@ class DeployCommand extends Command {
 
     final creds = Credentials.load();
     if (creds == null) {
-      stderr.writeln('Not authenticated. Run: dart_desk login');
+      stderr.writeln('Not authenticated. Run: dartdesk login');
       exit(1);
     }
     if (creds.isExpired) {
-      stderr.writeln('Session expired. Run: dart_desk login');
+      stderr.writeln('Session expired. Run: dartdesk login');
       exit(1);
     }
     return creds.token;

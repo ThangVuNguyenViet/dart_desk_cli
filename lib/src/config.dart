@@ -3,10 +3,12 @@ import 'package:yaml/yaml.dart';
 import 'package:path/path.dart' as p;
 
 class CmsConfig {
-  final String projectSlug;
+  static const defaultServer = 'https://api.dartdesk.dev';
+
+  final String projectId;
   final String server;
 
-  CmsConfig({required this.projectSlug, required this.server});
+  CmsConfig({required this.projectId, required this.server});
 
   static CmsConfig load([String? projectDir]) {
     final dir = projectDir ?? Directory.current.path;
@@ -16,18 +18,17 @@ class CmsConfig {
       throw Exception(
         'dart_desk.yaml not found in $dir\n'
         'Create one with:\n'
-        '  project_slug: your-project-slug\n'
-        '  server: https://api.dartdesk.dev',
+        '  project_id: your-project-id',
       );
     }
 
     final yaml = loadYaml(file.readAsStringSync()) as YamlMap;
-    final projectSlug = yaml['project_slug'] as String?;
-    if (projectSlug == null || projectSlug.isEmpty) {
-      throw Exception('dart_desk.yaml must contain a "project_slug" field');
+    final projectId = yaml['project_id'] as String?;
+    if (projectId == null || projectId.isEmpty) {
+      throw Exception('dart_desk.yaml must contain a "project_id" field');
     }
 
-    final server = (yaml['server'] as String?) ?? 'https://api.dartdesk.dev';
-    return CmsConfig(projectSlug: projectSlug, server: server.replaceAll(RegExp(r'/$'), ''));
+    final server = (yaml['server'] as String?) ?? defaultServer;
+    return CmsConfig(projectId: projectId, server: server.replaceAll(RegExp(r'/$'), ''));
   }
 }

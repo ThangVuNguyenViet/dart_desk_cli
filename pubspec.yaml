@@ -12,7 +12,7 @@ environment:
   sdk: ^3.5.0
 
 executables:
-  dart_desk: dart_desk_cli
+  dartdesk: dart_desk_cli
 
 dependencies:
   args: ^2.5.0

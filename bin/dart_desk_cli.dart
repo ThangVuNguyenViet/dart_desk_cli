@@ -7,7 +7,7 @@ import 'package:dart_desk_cli/src/commands/login_command.dart';
 import 'package:dart_desk_cli/src/commands/logout_command.dart';
 
 void main(List<String> args) async {
-  final runner = CommandRunner('dart_desk', 'Dart Desk CLI tool')
+  final runner = CommandRunner('dartdesk', 'Dart Desk CLI tool')
     ..addCommand(LoginCommand())
     ..addCommand(LogoutCommand())
     ..addCommand(DeployCommand())
