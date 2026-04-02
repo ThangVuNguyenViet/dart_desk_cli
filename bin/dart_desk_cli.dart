@@ -5,13 +5,15 @@ import 'package:dart_desk_cli/src/commands/deploy_command.dart';
 import 'package:dart_desk_cli/src/commands/deployments_command.dart';
 import 'package:dart_desk_cli/src/commands/login_command.dart';
 import 'package:dart_desk_cli/src/commands/logout_command.dart';
+import 'package:dart_desk_cli/src/commands/migration_command.dart';
 
 void main(List<String> args) async {
   final runner = CommandRunner('dartdesk', 'Dart Desk CLI tool')
     ..addCommand(LoginCommand())
     ..addCommand(LogoutCommand())
     ..addCommand(DeployCommand())
-    ..addCommand(DeploymentsCommand());
+    ..addCommand(DeploymentsCommand())
+    ..addCommand(MigrationCommand());
 
   try {
     await runner.run(args);
