@@ -7,6 +7,7 @@ import 'package:path/path.dart' as p;
 
 import '../config.dart';
 import '../credentials.dart';
+import '../migration.dart';
 
 class MigrationCommand extends Command {
   @override
@@ -56,26 +57,23 @@ class _CreateSubcommand extends Command {
     }
 
     final file = File(p.join(migrationsDir.path, fileName));
-    file.writeAsStringSync(_migrationTemplate(title, slug));
+    file.writeAsStringSync(_migrationTemplate(title));
 
     stdout.writeln('Created migration: migrations/$fileName');
   }
 
-  String _migrationTemplate(String title, String slug) {
-    return '''// Migration: $title
-// Generated: ${DateTime.now().toIso8601String()}
+  String _migrationTemplate(String title) {
+    return '''import 'package:dart_desk_cli/migration.dart';
 
-const String migrationTitle = '$title';
-const String migrationDocumentType = 'yourDocumentType';
-
-const List<Map<String, dynamic>> operations = [
-  // Example operation:
-  // {
-  //   'type': 'addField',
-  //   'field': 'fieldName',
-  //   'value': null,
-  // },
-];
+final migration = defineMigration(
+  title: '$title',
+  documentType: 'TODO: set document type',
+  operations: [
+    // renameField('oldName', 'newName'),
+    // deleteField('fieldToRemove'),
+    // setField('fieldName', 'value'),
+  ],
+);
 ''';
   }
 }
@@ -194,7 +192,7 @@ class _RunSubcommand extends Command {
 
     if (migration == null) {
       stderr.writeln(
-          'Could not parse migration file. Ensure it defines migrationTitle, migrationDocumentType, and operations.');
+          'Could not parse migration file. Ensure it uses defineMigration() with title and documentType.');
       exit(1);
     }
 
@@ -228,48 +226,60 @@ class _RunSubcommand extends Command {
     }
   }
 
-  _MigrationDef? _parseMigrationFile(String content) {
-    final titleMatch =
-        RegExp(r"const\s+String\s+migrationTitle\s*=\s*'([^']*)'").firstMatch(content) ??
-        RegExp(r'const\s+String\s+migrationTitle\s*=\s*"([^"]*)"').firstMatch(content);
+  /// Parse a migration Dart file using regex extraction.
+  Migration? _parseMigrationFile(String content) {
+    final titleMatch = RegExp(r"title:\s*'([^']*)'").firstMatch(content);
     final docTypeMatch =
-        RegExp(r"const\s+String\s+migrationDocumentType\s*=\s*'([^']*)'").firstMatch(content) ??
-        RegExp(r'const\s+String\s+migrationDocumentType\s*=\s*"([^"]*)"').firstMatch(content);
-    final opsMatch = RegExp(
-            r'const\s+List<Map<String,\s*dynamic>>\s+operations\s*=\s*(\[[\s\S]*?\]);',
-            multiLine: true)
-        .firstMatch(content);
+        RegExp(r"documentType:\s*'([^']*)'").firstMatch(content);
 
     if (titleMatch == null || docTypeMatch == null) return null;
 
     final title = titleMatch.group(1)!;
     final documentType = docTypeMatch.group(1)!;
-    final operationsRaw = opsMatch?.group(1) ?? '[]';
+    final operations = <MigrationOp>[];
 
-    return _MigrationDef(
+    // Parse renameField('from', 'to')
+    for (final match
+        in RegExp(r"renameField\(\s*'([^']*)'\s*,\s*'([^']*)'\s*\)")
+            .allMatches(content)) {
+      operations.add(renameField(match.group(1)!, match.group(2)!));
+    }
+
+    // Parse deleteField('path')
+    for (final match
+        in RegExp(r"deleteField\(\s*'([^']*)'\s*\)").allMatches(content)) {
+      operations.add(deleteField(match.group(1)!));
+    }
+
+    // Parse setField('path', value)
+    for (final match
+        in RegExp(r"setField\(\s*'([^']*)'\s*,\s*(.+?)\s*\)")
+            .allMatches(content)) {
+      final path = match.group(1)!;
+      final valueStr = match.group(2)!.trim();
+      dynamic value;
+      if (valueStr == 'true') {
+        value = true;
+      } else if (valueStr == 'false') {
+        value = false;
+      } else if (valueStr == 'null') {
+        value = null;
+      } else if (int.tryParse(valueStr) != null) {
+        value = int.parse(valueStr);
+      } else if (double.tryParse(valueStr) != null) {
+        value = double.parse(valueStr);
+      } else {
+        value = valueStr.replaceAll(RegExp(r"^'|'$"), '');
+      }
+      operations.add(setField(path, value));
+    }
+
+    return defineMigration(
       title: title,
       documentType: documentType,
-      operationsRaw: operationsRaw,
+      operations: operations,
     );
   }
-}
-
-class _MigrationDef {
-  final String title;
-  final String documentType;
-  final String operationsRaw;
-
-  _MigrationDef({
-    required this.title,
-    required this.documentType,
-    required this.operationsRaw,
-  });
-
-  /// Returns the operations as a JSON string suitable for the backend.
-  /// Because the Dart literal may not be valid JSON, we pass it as-is as a
-  /// raw string and let the backend parse it.  For simple cases (no Dart-only
-  /// syntax) this works.  A future improvement would be to evaluate the file.
-  String operationsToJson() => operationsRaw;
 }
 
 // ---------------------------------------------------------------------------
