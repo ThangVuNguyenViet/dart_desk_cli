@@ -15,25 +15,49 @@ void main() {
       tempDir.deleteSync(recursive: true);
     });
 
-    test('loads project_id and server from yaml', () {
-      File(p.join(tempDir.path, 'dart_desk.yaml')).writeAsStringSync('project_id: my-project\nserver: https://custom.server.com\n');
+    test('parses the new shape', () {
+      File(p.join(tempDir.path, 'dart_desk.yaml')).writeAsStringSync('''
+client_slug: dartdesk
+project_slug: demo
+server: https://api.dartdesk.dev
+''');
       final config = CmsConfig.load(tempDir.path);
-      expect(config.projectId, 'my-project');
-      expect(config.server, 'https://custom.server.com');
+      expect(config.clientSlug, equals('dartdesk'));
+      expect(config.projectSlug, equals('demo'));
+      expect(config.server, equals('https://api.dartdesk.dev'));
+    });
+
+    test('errors with helpful message on legacy project_id field', () {
+      File(p.join(tempDir.path, 'dart_desk.yaml')).writeAsStringSync('''
+project_id: dartdesk-demo
+server: https://api.dartdesk.dev
+''');
+      expect(
+        () => CmsConfig.load(tempDir.path),
+        throwsA(predicate((e) =>
+            e.toString().contains('project_id') &&
+            e.toString().contains('client_slug'))),
+      );
+    });
+
+    test('errors when client_slug or project_slug missing', () {
+      File(p.join(tempDir.path, 'dart_desk.yaml')).writeAsStringSync('''
+client_slug: dartdesk
+server: https://api.dartdesk.dev
+''');
+      expect(() => CmsConfig.load(tempDir.path), throwsA(isA<Exception>()));
     });
 
     test('defaults server when not specified', () {
-      File(p.join(tempDir.path, 'dart_desk.yaml')).writeAsStringSync('project_id: my-project\n');
+      File(p.join(tempDir.path, 'dart_desk.yaml')).writeAsStringSync('''
+client_slug: dartdesk
+project_slug: demo
+''');
       final config = CmsConfig.load(tempDir.path);
       expect(config.server, 'https://api.dartdesk.dev');
     });
 
     test('throws when file missing', () {
-      expect(() => CmsConfig.load(tempDir.path), throwsException);
-    });
-
-    test('throws when project_id missing', () {
-      File(p.join(tempDir.path, 'dart_desk.yaml')).writeAsStringSync('server: https://example.com\n');
       expect(() => CmsConfig.load(tempDir.path), throwsException);
     });
   });
