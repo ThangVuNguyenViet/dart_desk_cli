@@ -36,11 +36,16 @@ class _ListSubcommand extends Command {
     final token = _resolveToken(argResults);
 
     final response = await http.get(
-      Uri.parse('${config.server}/deployment?slug=${config.projectId}&action=list'),
+      Uri.parse(
+        '${config.server}/deployment'
+        '?clientSlug=${Uri.encodeQueryComponent(config.clientSlug)}'
+        '&projectSlug=${Uri.encodeQueryComponent(config.projectSlug)}'
+        '&action=list',
+      ),
       headers: {'Authorization': 'Bearer $token'},
     );
 
-    stdout.writeln('Deployments for ${config.projectId}:');
+    stdout.writeln('Deployments for ${config.clientSlug}/${config.projectSlug}:');
     stdout.writeln(response.body);
   }
 }
@@ -65,12 +70,17 @@ class _RollbackSubcommand extends Command {
     final version = int.parse(argResults!['version']);
 
     final response = await http.post(
-      Uri.parse('${config.server}/deployment?slug=${config.projectId}&action=activate&version=$version'),
+      Uri.parse(
+        '${config.server}/deployment'
+        '?clientSlug=${Uri.encodeQueryComponent(config.clientSlug)}'
+        '&projectSlug=${Uri.encodeQueryComponent(config.projectSlug)}'
+        '&action=activate&version=$version',
+      ),
       headers: {'Authorization': 'Bearer $token'},
     );
 
     if (response.statusCode == 200) {
-      stdout.writeln('Activated v$version for ${config.projectId}');
+      stdout.writeln('Activated v$version for ${config.clientSlug}/${config.projectSlug}');
     } else {
       stderr.writeln('Rollback failed: ${response.body}');
       exit(1);

@@ -62,9 +62,12 @@ class DeployCommand extends Command {
       exit(1);
     }
 
-    stdout.writeln('Deploying ${config.projectId}...');
-    final url =
-        Uri.parse('${config.server}/deployment/upload?slug=${config.projectId}');
+    stdout.writeln('Deploying ${config.clientSlug}/${config.projectSlug}...');
+    final url = Uri.parse(
+      '${config.server}/deployment/upload'
+      '?clientSlug=${Uri.encodeQueryComponent(config.clientSlug)}'
+      '&projectSlug=${Uri.encodeQueryComponent(config.projectSlug)}',
+    );
 
     final request = http.Request('POST', url)
       ..headers['Authorization'] = 'Bearer $token'
