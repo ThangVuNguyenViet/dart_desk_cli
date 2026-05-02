@@ -10,7 +10,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     container:
-      image: dart:3.5
+      image: dart:stable
 
     steps:
       - uses: actions/checkout@v4
