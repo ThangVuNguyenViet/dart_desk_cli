@@ -64,7 +64,7 @@ class DeployCommand extends Command {
 
     stdout.writeln('Deploying ${config.clientSlug}/${config.projectSlug}...');
     final url = Uri.parse(
-      '${config.server}/deployment/upload'
+      '${config.webServer}/deployment/upload'
       '?clientSlug=${Uri.encodeQueryComponent(config.clientSlug)}'
       '&projectSlug=${Uri.encodeQueryComponent(config.projectSlug)}',
     );
