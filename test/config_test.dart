@@ -57,6 +57,38 @@ project_slug: demo
       expect(config.server, 'https://api.dartdesk.dev');
     });
 
+    test('webServer defaults by rewriting api. → app.', () {
+      File(p.join(tempDir.path, 'dart_desk.yaml')).writeAsStringSync('''
+client_slug: dartdesk
+project_slug: demo
+server: https://api.dartdesk.dev
+''');
+      final config = CmsConfig.load(tempDir.path);
+      expect(config.webServer, 'https://app.dartdesk.dev');
+    });
+
+    test('webServer is overridable', () {
+      File(p.join(tempDir.path, 'dart_desk.yaml')).writeAsStringSync('''
+client_slug: dartdesk
+project_slug: demo
+server: https://api.example.com
+web_server: https://web.example.com
+''');
+      final config = CmsConfig.load(tempDir.path);
+      expect(config.server, 'https://api.example.com');
+      expect(config.webServer, 'https://web.example.com');
+    });
+
+    test('webServer falls back to server when host has no api. prefix', () {
+      File(p.join(tempDir.path, 'dart_desk.yaml')).writeAsStringSync('''
+client_slug: dartdesk
+project_slug: demo
+server: http://localhost:8080
+''');
+      final config = CmsConfig.load(tempDir.path);
+      expect(config.webServer, 'http://localhost:8080');
+    });
+
     test('throws when file missing', () {
       expect(() => CmsConfig.load(tempDir.path), throwsException);
     });

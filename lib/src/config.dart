@@ -7,12 +7,21 @@ class CmsConfig {
 
   final String clientSlug;
   final String projectSlug;
+
+  /// API (RPC) server. Used for `dartdesk login` and other Serverpod
+  /// endpoint calls.
   final String server;
+
+  /// Web server hosting `/deployment/*` and other web routes. Defaults to
+  /// [server] with `api.` rewritten to `app.`. Override with `web_server:`
+  /// in `dart_desk.yaml`.
+  final String webServer;
 
   CmsConfig({
     required this.clientSlug,
     required this.projectSlug,
     required this.server,
+    required this.webServer,
   });
 
   static CmsConfig load([String? projectDir]) {
@@ -47,11 +56,27 @@ class CmsConfig {
       );
     }
 
-    final server = (yaml['server'] as String?) ?? defaultServer;
+    final server = ((yaml['server'] as String?) ?? defaultServer)
+        .replaceAll(RegExp(r'/$'), '');
+    final webServer = ((yaml['web_server'] as String?) ?? _deriveWebServer(server))
+        .replaceAll(RegExp(r'/$'), '');
     return CmsConfig(
       clientSlug: clientSlug,
       projectSlug: projectSlug,
-      server: server.replaceAll(RegExp(r'/$'), ''),
+      server: server,
+      webServer: webServer,
     );
+  }
+
+  /// Rewrites `https://api.<rest>` → `https://app.<rest>`. Otherwise returns
+  /// the input unchanged.
+  static String _deriveWebServer(String apiServer) {
+    final uri = Uri.tryParse(apiServer);
+    if (uri == null) return apiServer;
+    final host = uri.host;
+    if (host.startsWith('api.')) {
+      return uri.replace(host: 'app.${host.substring(4)}').toString();
+    }
+    return apiServer;
   }
 }

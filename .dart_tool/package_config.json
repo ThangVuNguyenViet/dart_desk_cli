@@ -321,8 +321,8 @@
     }
   ],
   "generator": "pub",
-  "generatorVersion": "3.11.1",
+  "generatorVersion": "3.11.5",
   "flutterRoot": "file:///opt/homebrew/share/flutter",
-  "flutterVersion": "3.41.4",
+  "flutterVersion": "3.41.8",
   "pubCache": "file:///Users/vietthangvunguyen/.pub-cache"
 }
